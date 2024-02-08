@@ -1,0 +1,298 @@
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Consultorio consultorio = new Consultorio();
+
+        // Registro de 5 doctores con especialidades distintas
+        Doctor doctor1 = new Doctor(1, "Dr. Smith", "Médico general");
+        Doctor doctor2 = new Doctor(2, "Dr. Johnson", "Ginecólogo");
+        Doctor doctor3 = new Doctor(3, "Dr. Garcia", "Dermatólogo");
+        Doctor doctor4 = new Doctor(4, "Dr. Patel", "Médico general");
+        Doctor doctor5 = new Doctor(5, "Dr. Lee", "Ginecólogo");
+        consultorio.registrarDoctor(doctor1);
+        consultorio.registrarDoctor(doctor2);
+        consultorio.registrarDoctor(doctor3);
+        consultorio.registrarDoctor(doctor4);
+        consultorio.registrarDoctor(doctor5);
+
+        // Registro inicial de 10 pacientes con necesidades aleatorias
+        for (int i = 1; i <= 10; i++) {
+            Paciente paciente = new Paciente(i, "Paciente " + i, necesidadAleatoria());
+            consultorio.registrarPaciente(paciente);
+        }
+
+        // Mostramos la información de los doctores y pacientes registrados
+        consultorio.mostrarDoctores();
+        consultorio.mostrarPacientes();
+
+        // Registro de más doctores y pacientes si se desea
+        registrarMasDoctoresYpacientes(consultorio);
+
+        // Asignación de citas según las reglas establecidas
+        List<Cita> citas = consultorio.asignarCitasSegunReglas();
+        mostrarCitas(citas);
+    }
+
+    // Método para generar una necesidad aleatoria para los pacientes
+    private static String necesidadAleatoria() {
+        String[] necesidades = {"Consulta general", "Revisión de la mujer", "Consulta por dolor de piel"};
+        return necesidades[(int) (Math.random() * necesidades.length)];
+    }
+
+    // Método para registrar más doctores y pacientes
+    private static void registrarMasDoctoresYpacientes(Consultorio consultorio) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("¿Desea registrar más doctores? (s/n)");
+        String respuesta = scanner.nextLine();
+        while (respuesta.equalsIgnoreCase("s")) {
+            System.out.println("Ingrese el nombre completo del doctor:");
+            String nombreDoctor = scanner.nextLine();
+            System.out.println("Seleccione la especialidad del doctor (1: Médico general, 2: Ginecólogo, 3: Dermatólogo):");
+            int opcionEspecialidad = Integer.parseInt(scanner.nextLine());
+            String especialidad;
+            switch (opcionEspecialidad) {
+                case 1:
+                    especialidad = "Médico general";
+                    break;
+                case 2:
+                    especialidad = "Ginecólogo";
+                    break;
+                case 3:
+                    especialidad = "Dermatólogo";
+                    break;
+                default:
+                    System.out.println("Opción inválida. Se seleccionará Médico general por defecto.");
+                    especialidad = "Médico general";
+            }
+            Doctor nuevoDoctor = new Doctor(consultorio.obtenerProximoIdDoctor(), nombreDoctor, especialidad);
+            consultorio.registrarDoctor(nuevoDoctor);
+            System.out.println("¿Desea registrar más doctores? (s/n)");
+            respuesta = scanner.nextLine();
+        }
+
+        System.out.println("¿Desea registrar más pacientes? (s/n)");
+        respuesta = scanner.nextLine();
+        while (respuesta.equalsIgnoreCase("s")) {
+            System.out.println("Ingrese el nombre completo del paciente:");
+            String nombrePaciente = scanner.nextLine();
+            System.out.println("Seleccione la necesidad del paciente (1: Consulta general, 2: Revisión de la mujer, 3: Consulta por dolor de piel):");
+            int opcionNecesidad = Integer.parseInt(scanner.nextLine());
+            String necesidad;
+            switch (opcionNecesidad) {
+                case 1:
+                    necesidad = "Consulta general";
+                    break;
+                case 2:
+                    necesidad = "Revisión de la mujer";
+                    break;
+                case 3:
+                    necesidad = "Consulta por dolor de piel";
+                    break;
+                default:
+                    System.out.println("Opción inválida. Se seleccionará Consulta general por defecto.");
+                    necesidad = "Consulta general";
+            }
+            Paciente nuevoPaciente = new Paciente(consultorio.obtenerProximoIdPaciente(), nombrePaciente, necesidad);
+            consultorio.registrarPaciente(nuevoPaciente);
+            System.out.println("¿Desea registrar más pacientes? (s/n)");
+            respuesta = scanner.nextLine();
+        }
+    }
+
+    // Método para mostrar las citas
+    private static void mostrarCitas(List<Cita> citas) {
+        System.out.println("Citas programadas:");
+        for (Cita cita : citas) {
+            System.out.println("Doctor: " + cita.getDoctor().getNombreCompleto() +
+                    ", Paciente: " + cita.getPaciente().getNombreCompleto() +
+                    ", Fecha: " + cita.getFechaHora().toString() +
+                    ", Motivo: " + cita.getMotivo());
+        }
+    }
+}
+
+class Consultorio {
+    private List<Doctor> doctores;
+    private List<Paciente> pacientes;
+    private int proximoIdDoctor;
+    private int proximoIdPaciente;
+
+    public Consultorio() {
+        doctores = new ArrayList<>();
+        pacientes = new ArrayList<>();
+        proximoIdDoctor = 1;
+        proximoIdPaciente = 1;
+    }
+
+    public void registrarDoctor(Doctor doctor) {
+        doctor.setId(proximoIdDoctor++);
+        doctores.add(doctor);
+    }
+
+    public void registrarPaciente(Paciente paciente) {
+        paciente.setId(proximoIdPaciente++);
+        pacientes.add(paciente);
+    }
+
+    public int obtenerProximoIdDoctor() {
+        return proximoIdDoctor;
+    }
+
+    public int obtenerProximoIdPaciente() {
+        return proximoIdPaciente;
+    }
+
+    public void mostrarDoctores() {
+        System.out.println("Doctores registrados:");
+        for (Doctor doctor : doctores) {
+            System.out.println(doctor);
+        }
+    }
+
+    public void mostrarPacientes() {
+        System.out.println("Pacientes registrados:");
+        for (Paciente paciente : pacientes) {
+            System.out.println(paciente);
+        }
+    }
+
+    public List<Cita> asignarCitasSegunReglas() {
+        List<Cita> citas = new ArrayList<>();
+        for (Paciente paciente : pacientes) {
+            Doctor doctor;
+            String motivo;
+            switch (paciente.getNecesidad()) {
+                case "Consulta general":
+                    doctor = buscarDoctorPorEspecialidad("Médico general");
+                    motivo = "Consulta general";
+                    break;
+                case "Revisión de la mujer":
+                    doctor = buscarDoctorPorEspecialidad("Ginecólogo");
+                    motivo = "Revisión de la mujer";
+                    break;
+                case "Consulta por dolor de piel":
+                    doctor = buscarDoctorPorEspecialidad("Dermatólogo");
+                    motivo = "Consulta por dolor de piel";
+                    break;
+                default:
+                    doctor = null;
+                    motivo = "Sin motivo";
+            }
+            if (doctor != null) {
+                LocalDateTime fechaHora = LocalDateTime.now().plusDays((int) (Math.random() * 7));
+                Cita cita = new Cita(doctor, paciente, fechaHora, motivo);
+                citas.add(cita);
+            }
+        }
+        return citas;
+    }
+
+    private Doctor buscarDoctorPorEspecialidad(String especialidad) {
+        for (Doctor doctor : doctores) {
+            if (doctor.getEspecialidad().equals(especialidad)) {
+                return doctor;
+            }
+        }
+        return null;
+    }
+}
+
+class Doctor {
+    private int id;
+    private String nombreCompleto;
+    private String especialidad;
+
+    public Doctor(int id, String nombreCompleto, String especialidad) {
+        this.id = id;
+        this.nombreCompleto = nombreCompleto;
+        this.especialidad = especialidad;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getNombreCompleto() {
+        return nombreCompleto;
+    }
+
+    public String getEspecialidad() {
+        return especialidad;
+    }
+
+    @Override
+    public String toString() {
+        return "Doctor{" +
+                "id=" + id +
+                ", nombreCompleto='" + nombreCompleto + '\'' +
+                ", especialidad='" + especialidad + '\'' +
+                '}';
+    }
+}
+
+class Paciente {
+    private int id;
+    private String nombreCompleto;
+    private String necesidad;
+
+    public Paciente(int id, String nombreCompleto, String necesidad) {
+        this.id = id;
+        this.nombreCompleto = nombreCompleto;
+        this.necesidad = necesidad;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getNombreCompleto() {
+        return nombreCompleto;
+    }
+
+    public String getNecesidad() {
+        return necesidad;
+    }
+
+    @Override
+    public String toString() {
+        return "Paciente{" +
+                "id=" + id +
+                ", nombreCompleto='" + nombreCompleto + '\'' +
+                ", necesidad='" + necesidad + '\'' +
+                '}';
+    }
+}
+
+class Cita {
+    private Doctor doctor;
+    private Paciente paciente;
+    private LocalDateTime fechaHora;
+    private String motivo;
+
+    public Cita(Doctor doctor, Paciente paciente, LocalDateTime fechaHora, String motivo) {
+        this.doctor = doctor;
+        this.paciente = paciente;
+        this.fechaHora = fechaHora;
+        this.motivo = motivo;
+    }
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public Paciente getPaciente() {
+        return paciente;
+    }
+
+    public LocalDateTime getFechaHora() {
+        return fechaHora;
+    }
+
+    public String getMotivo() {
+        return motivo;
+    }
+}
